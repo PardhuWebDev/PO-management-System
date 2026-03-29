@@ -14,7 +14,16 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./sql/init.sql:/docker-entrypoint-initdb.d/init.sql  # auto-runs on first start
+      - ./sql/init.sql:/docker-entrypoint-initdb.d/init.sql
+
+  mongo:
+    image: mongo:7
+    container_name: po_mongo
+    restart: always
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
 
   backend:
     build: ./backend
@@ -24,12 +33,15 @@ services:
       - ./backend/.env
     environment:
       DATABASE_URL: postgresql://po_user:po_pass@db:5432/po_db
+      MONGO_URL: mongodb://mongo:27017
     ports:
       - "8000:8000"
     depends_on:
       - db
+      - mongo
     volumes:
-      - ./backend:/app   # hot reload in dev
+      - ./backend:/app
 
 volumes:
   postgres_data:
+  mongo_data:

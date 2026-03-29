@@ -1,267 +1,85 @@
 ﻿<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>PO Management — Login</title>
+  <title>PO Management — Sign In</title>
   <link rel="stylesheet" href="css/style.css"/>
   <style>
-    body {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-      background: var(--bg);
-      background-image:
-        linear-gradient(var(--border) 1px, transparent 1px),
-        linear-gradient(90deg, var(--border) 1px, transparent 1px);
-      background-size: 40px 40px;
-    }
-
-    .login-card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 3rem 2.5rem;
-      width: 100%;
-      max-width: 400px;
-      text-align: center;
-      animation: fadeUp 0.5s ease both;
-    }
-
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(20px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-
-    .login-logo {
-      font-family: var(--font-mono);
-      font-size: 0.8rem;
-      color: var(--accent);
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
-      margin-bottom: 0.5rem;
-    }
-
-    .login-title {
-      font-family: var(--font-mono);
-      font-size: 1.6rem;
-      font-weight: 700;
-      margin-bottom: 0.5rem;
-    }
-
-    .login-sub {
-      color: var(--muted);
-      font-size: 0.875rem;
-      margin-bottom: 2.5rem;
-    }
-
-    .btn-google {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 0.75rem;
-      width: 100%;
-      padding: 0.85rem;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      color: var(--text);
-      font-family: var(--font-sans);
-      font-size: 0.95rem;
-      font-weight: 500;
-      cursor: pointer;
-      text-decoration: none;
-      transition: all 0.2s ease;
-    }
-    .btn-google:hover {
-      border-color: var(--accent);
-      background: rgba(79,110,247,0.06);
-      transform: translateY(-1px);
-    }
-
-    .divider {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-      margin: 1.5rem 0;
-      color: var(--muted);
-      font-size: 0.75rem;
-      font-family: var(--font-mono);
-    }
-    .divider::before, .divider::after {
-      content: '';
-      flex: 1;
-      height: 1px;
-      background: var(--border);
-    }
-
-    /* Dev modal */
-    .modal-overlay {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.7);
-      z-index: 200;
-      align-items: center;
-      justify-content: center;
-    }
-    .modal-overlay.open { display: flex; }
-
-    .modal {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 2rem;
-      width: 100%;
-      max-width: 340px;
-      animation: fadeUp 0.25s ease both;
-    }
-
-    .modal-title {
-      font-family: var(--font-mono);
-      font-size: 1rem;
-      margin-bottom: 0.4rem;
-      color: var(--accent);
-    }
-
-    .modal-sub {
-      font-size: 0.8rem;
-      color: var(--muted);
-      margin-bottom: 1.2rem;
-    }
-
-    .pw-wrap {
-      position: relative;
-      margin-bottom: 0.75rem;
-    }
-
-    .pw-wrap input {
-      padding-right: 2.5rem;
-    }
-
-    .pw-toggle {
-      position: absolute;
-      right: 0.75rem;
-      top: 50%;
-      transform: translateY(-50%);
-      background: none;
-      border: none;
-      color: var(--muted);
-      cursor: pointer;
-      font-size: 1rem;
-      line-height: 1;
-    }
-
-    .error-msg {
-      font-size: 0.8rem;
-      color: var(--red);
-      margin-bottom: 0.75rem;
-      font-family: var(--font-mono);
-      display: none;
-    }
-
-    .modal-actions { display: flex; gap: 0.75rem; }
-
-    .login-footer {
-      margin-top: 2rem;
-      font-size: 0.75rem;
-      color: var(--muted);
-    }
+    body { display:flex; align-items:center; justify-content:center; min-height:100vh; overflow:hidden; }
+    .bg-orb { position:fixed; border-radius:50%; filter:blur(80px); pointer-events:none; z-index:0; }
+    .bg-orb-1 { width:500px; height:500px; background:rgba(99,102,241,0.12); top:-100px; left:-100px; animation:drift 8s ease-in-out infinite alternate; }
+    .bg-orb-2 { width:400px; height:400px; background:rgba(34,211,165,0.06); bottom:-100px; right:-100px; animation:drift 10s ease-in-out infinite alternate-reverse; }
+    @keyframes drift { from{transform:translate(0,0)} to{transform:translate(30px,20px)} }
+    .login-wrap { position:relative; z-index:1; width:100%; max-width:420px; padding:1rem; animation:fadeUp 0.5s cubic-bezier(0.34,1.56,0.64,1) both; }
+    .login-card { background:rgba(19,19,31,0.8); border:1px solid var(--border-bright); border-radius:20px; padding:2.5rem; backdrop-filter:blur(24px); box-shadow:var(--shadow),var(--shadow-accent); }
+    .login-badge { display:inline-flex; align-items:center; gap:0.4rem; background:var(--accent-dim); border:1px solid rgba(99,102,241,0.3); border-radius:999px; padding:0.25rem 0.75rem; font-family:var(--font-mono); font-size:0.7rem; color:var(--accent); letter-spacing:0.08em; margin-bottom:1.5rem; }
+    .login-badge-dot { width:5px; height:5px; border-radius:50%; background:var(--accent); box-shadow:0 0 6px var(--accent); animation:pulse 2s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+    .login-title { font-family:var(--font-mono); font-size:1.75rem; font-weight:700; line-height:1.2; margin-bottom:0.5rem; background:linear-gradient(135deg,var(--text) 60%,var(--accent)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+    .login-sub { color:var(--text-2); font-size:0.875rem; margin-bottom:2rem; line-height:1.6; }
+    .btn-google { display:flex; align-items:center; justify-content:center; gap:0.75rem; width:100%; padding:0.85rem; background:var(--surface); border:1px solid var(--border-bright); border-radius:var(--radius); color:var(--text); font-family:var(--font-sans); font-size:0.9rem; font-weight:500; cursor:pointer; text-decoration:none; transition:all 0.2s ease; }
+    .btn-google:hover { border-color:var(--accent); background:var(--accent-dim); transform:translateY(-1px); box-shadow:0 4px 20px rgba(99,102,241,0.15); }
+    .divider { display:flex; align-items:center; gap:1rem; margin:1.25rem 0; color:var(--muted); font-size:0.72rem; font-family:var(--font-mono); }
+    .divider::before,.divider::after { content:''; flex:1; height:1px; background:var(--border); }
+    .modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); backdrop-filter:blur(4px); z-index:200; align-items:center; justify-content:center; }
+    .modal-overlay.open { display:flex; }
+    .modal { background:var(--card); border:1px solid var(--border-bright); border-radius:var(--radius-lg); padding:2rem; width:100%; max-width:340px; box-shadow:var(--shadow); animation:fadeUp 0.25s cubic-bezier(0.34,1.56,0.64,1) both; }
+    .modal-title { font-family:var(--font-mono); font-size:0.95rem; font-weight:600; margin-bottom:0.3rem; color:var(--text); }
+    .modal-sub { font-size:0.82rem; color:var(--text-2); margin-bottom:1.25rem; }
+    .pw-wrap { position:relative; margin-bottom:0.6rem; }
+    .pw-wrap input { padding-right:2.75rem; }
+    .pw-toggle { position:absolute; right:0.75rem; top:50%; transform:translateY(-50%); background:none; border:none; color:var(--muted); cursor:pointer; font-size:0.9rem; line-height:1; transition:color 0.15s; }
+    .pw-toggle:hover { color:var(--text); }
+    .error-msg { font-size:0.78rem; color:var(--red); margin-bottom:0.75rem; font-family:var(--font-mono); display:none; background:rgba(244,63,94,0.08); padding:0.4rem 0.6rem; border-radius:6px; border:1px solid rgba(244,63,94,0.2); }
+    .modal-actions { display:flex; gap:0.75rem; }
+    .login-footer { margin-top:1.75rem; font-size:0.72rem; color:var(--muted); text-align:center; font-family:var(--font-mono); }
   </style>
 </head>
 <body>
-
-  <div class="login-card">
-    <div class="login-logo">IV Innovations</div>
-    <h1 class="login-title">PO Management</h1>
-    <p class="login-sub">Sign in to manage purchase orders, vendors, and products.</p>
-
-    <a class="btn-google" href="http://localhost:8000/auth/login">
-      <svg width="20" height="20" viewBox="0 0 48 48">
-        <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
-        <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
-        <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
-        <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.35-8.16 2.35-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
-      </svg>
-      Continue with Google
-    </a>
-
-    <div class="divider">or</div>
-
-    <button class="btn btn-outline" style="width:100%;justify-content:center;"
-      onclick="openDevModal()">
-      Dev Mode
-    </button>
-
-    <p class="login-footer">
-      Purchase Order Management System &copy; 2025 IV Innovations
-    </p>
+  <div class="bg-orb bg-orb-1"></div>
+  <div class="bg-orb bg-orb-2"></div>
+  <div class="login-wrap">
+    <div class="login-card">
+      <div class="login-badge"><div class="login-badge-dot"></div>IV INNOVATIONS</div>
+      <h1 class="login-title">PO Management<br>System</h1>
+      <p class="login-sub">Manage purchase orders, vendors, and products — all in one place.</p>
+      <a class="btn-google" href="http://localhost:8000/auth/login">
+        <svg width="18" height="18" viewBox="0 0 48 48">
+          <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+          <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+          <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+          <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.35-8.16 2.35-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+        </svg>
+        Continue with Google
+      </a>
+      <div class="divider">or</div>
+      <button class="btn btn-outline" style="width:100%;justify-content:center;" onclick="openDevModal()">⚡ Developer Access</button>
+      <p class="login-footer">Purchase Order Management · IV Innovations Pvt. Ltd.</p>
+    </div>
   </div>
-
-  <!-- Dev password modal -->
   <div class="modal-overlay" id="devModal">
     <div class="modal">
-      <div class="modal-title"> Developer Access</div>
-      <p class="modal-sub">Enter the developer password to continue.</p>
-
+      <div class="modal-title">Developer Access</div>
+      <p class="modal-sub">Enter your developer password to continue.</p>
       <div class="pw-wrap">
-        <input type="password" id="devPassword" placeholder="Password"
-          onkeydown="if(event.key==='Enter') submitDev()"/>
+        <input type="password" id="devPassword" placeholder="Enter password" onkeydown="if(event.key==='Enter') submitDev()"/>
         <button class="pw-toggle" onclick="togglePw()" id="pwToggle">👁</button>
       </div>
-
-      <div class="error-msg" id="pwError">Incorrect password. Try again.</div>
-
+      <div class="error-msg" id="pwError">Incorrect password. Please try again.</div>
       <div class="modal-actions">
         <button class="btn btn-outline" style="flex:1" onclick="closeDevModal()">Cancel</button>
         <button class="btn btn-primary" style="flex:1" onclick="submitDev()">Enter</button>
       </div>
     </div>
   </div>
-
   <script>
     const DEV_PASSWORD = 'PardhuDevelops@123';
-
-    function openDevModal() {
-      document.getElementById('devModal').classList.add('open');
-      document.getElementById('devPassword').focus();
-      document.getElementById('pwError').style.display = 'none';
-      document.getElementById('devPassword').value = '';
-    }
-
-    function closeDevModal() {
-      document.getElementById('devModal').classList.remove('open');
-    }
-
-    function togglePw() {
-      const input  = document.getElementById('devPassword');
-      const toggle = document.getElementById('pwToggle');
-      if (input.type === 'password') {
-        input.type    = 'text';
-        toggle.textContent = '🙈';
-      } else {
-        input.type    = 'password';
-        toggle.textContent = '👁';
-      }
-    }
-
-    function submitDev() {
-      const val = document.getElementById('devPassword').value;
-      if (val === DEV_PASSWORD) {
-        window.location.href = 'dashboard.html';
-      } else {
-        const err = document.getElementById('pwError');
-        err.style.display = 'block';
-        document.getElementById('devPassword').value = '';
-        document.getElementById('devPassword').focus();
-      }
-    }
-
-    // Close modal on overlay click
-    document.getElementById('devModal').addEventListener('click', function(e) {
-      if (e.target === this) closeDevModal();
-    });
+    function openDevModal() { document.getElementById('devModal').classList.add('open'); document.getElementById('devPassword').focus(); document.getElementById('pwError').style.display='none'; document.getElementById('devPassword').value=''; }
+    function closeDevModal() { document.getElementById('devModal').classList.remove('open'); }
+    function togglePw() { const i=document.getElementById('devPassword'),t=document.getElementById('pwToggle'); i.type=i.type==='password'?'text':'password'; t.textContent=i.type==='password'?'👁':'🙈'; }
+    function submitDev() { if(document.getElementById('devPassword').value===DEV_PASSWORD){window.location.href='dashboard.html';}else{document.getElementById('pwError').style.display='block';document.getElementById('devPassword').value='';document.getElementById('devPassword').focus();} }
+    document.getElementById('devModal').addEventListener('click',function(e){if(e.target===this)closeDevModal();});
   </script>
 </body>
 </html>

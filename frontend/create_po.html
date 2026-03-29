@@ -1,266 +1,81 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>PO Management — Create Order</title>
+  <title>PO Management — New Order</title>
   <link rel="stylesheet" href="css/style.css"/>
   <style>
-    .ai-btn {
-      background: linear-gradient(135deg, #4f6ef7, #7c3aed);
-      border: none; border-radius: 4px; color: #fff;
-      font-size: 0.7rem; padding: 0.25rem 0.5rem;
-      cursor: pointer; white-space: nowrap;
-      transition: opacity 0.2s; font-family: var(--font-mono);
-    }
-    .ai-btn:hover    { opacity: 0.85; }
-    .ai-btn:disabled { opacity: 0.5; cursor: wait; }
-    .ai-tooltip {
-      font-size: 0.8rem; color: var(--muted); font-style: italic;
-      padding: 0.5rem 0.8rem;
-      background: rgba(79,110,247,0.06);
-      border-left: 2px solid var(--accent);
-      border-radius: 4px; margin-top: 0.4rem;
-      display: none; animation: fadeIn 0.3s ease;
-    }
-    @keyframes fadeIn { from{opacity:0;transform:translateY(-4px)} to{opacity:1} }
-    .product-cell { display:flex; flex-direction:column; gap:0.3rem; }
-    .product-row-top { display:flex; align-items:center; gap:0.5rem; }
+    .ai-btn{display:inline-flex;align-items:center;gap:0.3rem;background:linear-gradient(135deg,var(--accent),#8b5cf6);border:none;border-radius:6px;color:#fff;font-size:0.7rem;font-family:var(--font-mono);padding:0.28rem 0.6rem;cursor:pointer;white-space:nowrap;transition:all 0.2s;flex-shrink:0;}
+    .ai-btn:hover{opacity:0.85;transform:translateY(-1px);}
+    .ai-btn:disabled{opacity:0.4;cursor:wait;transform:none;}
+    .ai-desc{font-size:0.78rem;color:var(--text-2);font-style:italic;padding:0.5rem 0.75rem;background:var(--accent-dim);border-left:2px solid var(--accent);border-radius:0 6px 6px 0;margin-top:0.4rem;display:none;animation:fadeUp 0.3s ease both;line-height:1.5;}
+    .product-cell{display:flex;flex-direction:column;}
+    .product-top{display:flex;align-items:center;gap:0.5rem;}
+    .totals-section{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1rem 1.25rem;margin-bottom:1.5rem;display:flex;flex-direction:column;gap:0.5rem;}
+    .total-row-display{display:flex;justify-content:space-between;align-items:center;font-size:0.85rem;color:var(--text-2);}
+    .total-row-display.grand{border-top:1px solid var(--border-bright);padding-top:0.5rem;margin-top:0.25rem;font-size:1rem;font-weight:600;color:var(--text);font-family:var(--font-mono);}
+    .total-row-display span:last-child{font-family:var(--font-mono);}
   </style>
 </head>
 <body>
   <nav class="nav">
-    <a class="nav-brand" href="dashboard.html">PO<span>Manager</span></a>
-    <div class="nav-right">
-      <a href="dashboard.html" class="btn btn-outline btn-sm">← Back</a>
-    </div>
+    <a class="nav-brand" href="dashboard.html"><div class="nav-brand-dot"></div>PO Manager</a>
+    <div class="nav-right"><a href="dashboard.html" class="btn btn-outline btn-sm">← Dashboard</a></div>
   </nav>
-
-  <main class="page" style="max-width:860px">
+  <main class="page" style="max-width:820px">
     <div class="page-header">
-      <h1 class="page-title"><span>//</span> New Purchase Order</h1>
+      <h1 class="page-title"><span class="page-title-prefix">//</span> New Purchase Order</h1>
     </div>
     <div class="card">
-      <div class="form-grid" style="margin-bottom:1.5rem">
-        <div class="form-group">
-          <label for="vendorSelect">Vendor *</label>
-          <select id="vendorSelect">
-            <option value="">Loading vendors...</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label>Reference No</label>
-          <input type="text" id="refNoDisplay" disabled
-            placeholder="Auto-generated on submit" style="color:var(--muted)"/>
-        </div>
+      <div class="section-label">Order Details</div>
+      <div class="form-grid" style="margin-bottom:1.75rem">
+        <div class="form-group"><label for="vendorSelect">Vendor *</label><select id="vendorSelect"><option value="">Loading vendors...</option></select></div>
+        <div class="form-group"><label>Reference No</label><input type="text" disabled placeholder="Auto-generated on submit"/></div>
       </div>
-
-      <label style="display:block;margin-bottom:0.75rem">Order Items *</label>
-      <div class="items-table-wrap">
+      <div class="section-label">Line Items</div>
+      <div class="items-table-wrap" style="margin-bottom:0.75rem">
         <table class="items-table" style="width:100%">
-          <thead>
-            <tr>
-              <th>Product</th>
-              <th style="width:100px">Qty</th>
-              <th style="width:110px">Unit Price</th>
-              <th style="width:120px">Line Total</th>
-              <th style="width:50px"></th>
-            </tr>
-          </thead>
+          <thead><tr><th>Product</th><th style="width:90px">Qty</th><th style="width:110px">Unit Price</th><th style="width:110px">Line Total</th><th style="width:40px"></th></tr></thead>
           <tbody id="itemsBody"></tbody>
-          <tfoot>
-            <tr>
-              <td colspan="3" style="text-align:right">Subtotal</td>
-              <td id="subtotalDisplay">$0.00</td><td></td>
-            </tr>
-            <tr>
-              <td colspan="3" style="text-align:right">Tax (5%)</td>
-              <td id="taxDisplay" style="color:var(--yellow)">$0.00</td><td></td>
-            </tr>
-            <tr class="total-row">
-              <td colspan="3" style="text-align:right">Total</td>
-              <td id="totalDisplay">$0.00</td><td></td>
-            </tr>
-          </tfoot>
         </table>
       </div>
-
-      <button class="btn btn-outline btn-sm" onclick="addRow()" style="margin-bottom:1.5rem">
-        + Add Product Row
-      </button>
-
-      <div style="display:flex;justify-content:flex-end;gap:1rem">
+      <button class="btn btn-outline btn-sm" onclick="addRow()" style="margin-bottom:1.5rem">+ Add Row</button>
+      <div class="totals-section">
+        <div class="total-row-display"><span>Subtotal</span><span id="subtotalDisplay">.00</span></div>
+        <div class="total-row-display"><span style="color:var(--yellow)">Tax (5%)</span><span id="taxDisplay" style="color:var(--yellow)">.00</span></div>
+        <div class="total-row-display grand"><span>Total</span><span id="totalDisplay">.00</span></div>
+      </div>
+      <div style="display:flex;justify-content:flex-end;gap:0.75rem">
         <a href="dashboard.html" class="btn btn-outline">Cancel</a>
-        <button class="btn btn-primary" id="submitBtn" onclick="submitPO()">
-          Create Purchase Order
-        </button>
+        <button class="btn btn-primary" id="submitBtn" onclick="submitPO()">Create Purchase Order</button>
       </div>
     </div>
   </main>
-
   <div id="toast"></div>
-
   <script>
-    const API = 'http://localhost:8000';
-    let products = [];
-
-    function showToast(msg, type='success') {
-      const t = document.getElementById('toast');
-      t.textContent = msg; t.className = `show ${type}`;
-      setTimeout(() => t.className = '', 3500);
-    }
-
-    async function loadVendors() {
-      const sel = document.getElementById('vendorSelect');
-      try {
-        const data = await fetch(`${API}/vendors/`).then(r=>r.json());
-        sel.innerHTML = '<option value="">— Select Vendor —</option>' +
-          data.map(v=>`<option value="${v.id}">${v.name}</option>`).join('');
-      } catch { sel.innerHTML = '<option value="">Failed to load</option>'; }
-    }
-
-    async function loadProducts() {
-      try { products = await fetch(`${API}/products/`).then(r=>r.json()); }
-      catch { showToast('Failed to load products','error'); }
-    }
-
-    function productOptions() {
-      return '<option value="">— Select Product —</option>' +
-        products.map(p=>
-          `<option value="${p.id}" data-price="${p.unit_price}">${p.name} (${p.sku})</option>`
-        ).join('');
-    }
-
-    function addRow() {
-      const tbody = document.getElementById('itemsBody');
-      const rowId = Date.now();
-      const tr = document.createElement('tr');
-      tr.id = `row-${rowId}`;
-      tr.innerHTML = `
-        <td>
-          <div class="product-cell">
-            <div class="product-row-top">
-              <select onchange="onProductChange(${rowId})" id="prod-${rowId}" style="flex:1">
-                ${productOptions()}
-              </select>
-              <button class="ai-btn" id="aibtn-${rowId}"
-                onclick="autoDescribe(${rowId})" title="Generate AI description">
-                 Generate
-              </button>
-            </div>
-            <div class="ai-tooltip" id="aidesc-${rowId}"></div>
-          </div>
-        </td>
-        <td>
-          <input type="number" id="qty-${rowId}" value="1" min="1"
-            oninput="recalcRow(${rowId})" style="width:100%;text-align:right"/>
-        </td>
-        <td>
-          <input type="text" id="price-${rowId}" value="0.00" disabled
-            style="width:100%;text-align:right;color:var(--muted)"/>
-        </td>
-        <td id="linetotal-${rowId}"
-          style="font-family:var(--font-mono);text-align:right">$0.00</td>
-        <td>
-          <button class="remove-row-btn" onclick="removeRow(${rowId})">✕</button>
-        </td>`;
-      tbody.appendChild(tr);
+    const API='http://localhost:8000';
+    let products=[];
+    function showToast(msg,type='success'){const t=document.getElementById('toast');t.textContent=msg;t.className='show '+type;setTimeout(()=>t.className='',3500);}
+    async function loadVendors(){const sel=document.getElementById('vendorSelect');try{const data=await fetch(API+'/vendors/').then(r=>r.json());sel.innerHTML='<option value="">— Select a vendor —</option>'+data.map(v=>'<option value="'+v.id+'">'+v.name+'</option>').join('');}catch{sel.innerHTML='<option value="">Failed to load</option>';}}
+    async function loadProducts(){try{products=await fetch(API+'/products/').then(r=>r.json());}catch{showToast('Failed to load products','error');}}
+    function productOptions(){return'<option value="">— Select product —</option>'+products.map(p=>'<option value="'+p.id+'" data-price="'+p.unit_price+'">'+p.name+' ('+p.sku+')</option>').join('');}
+    function addRow(){
+      const rowId=Date.now();
+      const tr=document.createElement('tr');
+      tr.id='row-'+rowId;
+      tr.style.animation='fadeUp 0.25s ease both';
+      tr.innerHTML='<td><div class="product-cell"><div class="product-top"><select onchange="onProductChange('+rowId+')" id="prod-'+rowId+'" style="flex:1">'+productOptions()+'</select><button class="ai-btn" id="aibtn-'+rowId+'" onclick="autoDescribe('+rowId+')">✨ AI</button></div><div class="ai-desc" id="aidesc-'+rowId+'"></div></div></td><td><input type="number" id="qty-'+rowId+'" value="1" min="1" oninput="recalcRow('+rowId+')" style="text-align:right"/></td><td><input type="text" id="price-'+rowId+'" value="0.00" disabled style="text-align:right"/></td><td id="linetotal-'+rowId+'" style="font-family:var(--font-mono);text-align:right;font-weight:500">.00</td><td><button class="remove-row-btn" onclick="removeRow('+rowId+')">✕</button></td>';
+      document.getElementById('itemsBody').appendChild(tr);
       recalcTotals();
     }
-
-    function removeRow(rowId) {
-      document.getElementById(`row-${rowId}`)?.remove();
-      recalcTotals();
-    }
-
-    function onProductChange(rowId) {
-      const sel   = document.getElementById(`prod-${rowId}`);
-      const price = sel.options[sel.selectedIndex]?.dataset?.price || '0';
-      document.getElementById(`price-${rowId}`).value = parseFloat(price).toFixed(2);
-      const desc = document.getElementById(`aidesc-${rowId}`);
-      desc.style.display='none'; desc.textContent='';
-      recalcRow(rowId);
-    }
-
-    function recalcRow(rowId) {
-      const qty   = parseFloat(document.getElementById(`qty-${rowId}`).value)   || 0;
-      const price = parseFloat(document.getElementById(`price-${rowId}`).value) || 0;
-      document.getElementById(`linetotal-${rowId}`).textContent = '$'+(qty*price).toFixed(2);
-      recalcTotals();
-    }
-
-    function recalcTotals() {
-      let subtotal = 0;
-      document.getElementById('itemsBody').querySelectorAll('tr').forEach(row => {
-        const id = row.id.replace('row-','');
-        subtotal += (parseFloat(document.getElementById(`qty-${id}`)?.value)||0)
-                  * (parseFloat(document.getElementById(`price-${id}`)?.value)||0);
-      });
-      const tax=subtotal*0.05, total=subtotal+tax;
-      document.getElementById('subtotalDisplay').textContent = '$'+subtotal.toFixed(2);
-      document.getElementById('taxDisplay').textContent      = '$'+tax.toFixed(2);
-      document.getElementById('totalDisplay').textContent    = '$'+total.toFixed(2);
-    }
-
-    async function autoDescribe(rowId) {
-      const productId = document.getElementById(`prod-${rowId}`).value;
-      if (!productId) { showToast('Select a product first','error'); return; }
-
-      const btn  = document.getElementById(`aibtn-${rowId}`);
-      const desc = document.getElementById(`aidesc-${rowId}`);
-      btn.disabled=true; btn.textContent='...';
-      desc.style.display='none';
-
-      try {
-        const data = await fetch(`${API}/products/${productId}/describe`).then(r=>r.json());
-        desc.textContent   = '✨ ' + data.description;
-        desc.style.display = 'block';
-        showToast('Description generated!');
-      } catch {
-        showToast('Failed to generate description','error');
-      } finally {
-        btn.disabled=false; btn.textContent='✨ AI';
-      }
-    }
-
-    async function submitPO() {
-      const vendorId = document.getElementById('vendorSelect').value;
-      if (!vendorId) { showToast('Please select a vendor','error'); return; }
-
-      const items=[];
-      for (const row of document.getElementById('itemsBody').querySelectorAll('tr')) {
-        const id  = row.id.replace('row-','');
-        const pid = document.getElementById(`prod-${id}`)?.value;
-        const qty = parseInt(document.getElementById(`qty-${id}`).value);
-        if (!pid) { showToast('Select a product for every row','error'); return; }
-        if (!qty||qty<1) { showToast('Quantity must be at least 1','error'); return; }
-        items.push({ product_id: parseInt(pid), quantity: qty });
-      }
-      if (!items.length) { showToast('Add at least one product row','error'); return; }
-
-      const btn = document.getElementById('submitBtn');
-      btn.disabled=true; btn.textContent='Creating...';
-
-      try {
-        const res = await fetch(`${API}/orders/`, {
-          method:'POST',
-          headers:{'Content-Type':'application/json'},
-          body: JSON.stringify({ vendor_id: parseInt(vendorId), items })
-        });
-        if (!res.ok) { const e=await res.json(); throw new Error(e.detail); }
-        const order = await res.json();
-        showToast(`Order ${order.reference_no} created!`);
-        setTimeout(()=>window.location.href='dashboard.html', 1500);
-      } catch(e) {
-        showToast(e.message||'Failed to create order','error');
-        btn.disabled=false; btn.textContent='Create Purchase Order';
-      }
-    }
-
-    async function init() {
-      await Promise.all([loadVendors(), loadProducts()]);
-      addRow();
-    }
+    function removeRow(rowId){document.getElementById('row-'+rowId)?.remove();recalcTotals();}
+    function onProductChange(rowId){const sel=document.getElementById('prod-'+rowId);const price=sel.options[sel.selectedIndex]?.dataset?.price||'0';document.getElementById('price-'+rowId).value=parseFloat(price).toFixed(2);const desc=document.getElementById('aidesc-'+rowId);desc.style.display='none';desc.textContent='';recalcRow(rowId);}
+    function recalcRow(rowId){const qty=parseFloat(document.getElementById('qty-'+rowId).value)||0;const price=parseFloat(document.getElementById('price-'+rowId).value)||0;document.getElementById('linetotal-'+rowId).textContent='$'+(qty*price).toFixed(2);recalcTotals();}
+    function recalcTotals(){let sub=0;document.getElementById('itemsBody').querySelectorAll('tr').forEach(row=>{const id=row.id.replace('row-','');sub+=(parseFloat(document.getElementById('qty-'+id)?.value)||0)*(parseFloat(document.getElementById('price-'+id)?.value)||0);});const tax=sub*0.05,total=sub+tax;document.getElementById('subtotalDisplay').textContent='$'+sub.toFixed(2);document.getElementById('taxDisplay').textContent='$'+tax.toFixed(2);document.getElementById('totalDisplay').textContent='$'+total.toFixed(2);}
+    async function autoDescribe(rowId){const pid=document.getElementById('prod-'+rowId).value;if(!pid){showToast('Select a product first','error');return;}const btn=document.getElementById('aibtn-'+rowId);const desc=document.getElementById('aidesc-'+rowId);btn.disabled=true;btn.textContent='...';desc.style.display='none';try{const data=await fetch(API+'/products/'+pid+'/describe').then(r=>r.json());desc.textContent='✨ '+data.description;desc.style.display='block';showToast('Description generated!');}catch{showToast('Failed to generate','error');}finally{btn.disabled=false;btn.textContent='✨ AI';}}
+    async function submitPO(){const vendorId=document.getElementById('vendorSelect').value;if(!vendorId){showToast('Please select a vendor','error');return;}const items=[];for(const row of document.getElementById('itemsBody').querySelectorAll('tr')){const id=row.id.replace('row-','');const pid=document.getElementById('prod-'+id)?.value;const qty=parseInt(document.getElementById('qty-'+id).value);if(!pid){showToast('Select a product for every row','error');return;}if(!qty||qty<1){showToast('Quantity must be at least 1','error');return;}items.push({product_id:parseInt(pid),quantity:qty});}if(!items.length){showToast('Add at least one product row','error');return;}const btn=document.getElementById('submitBtn');btn.disabled=true;btn.textContent='Creating...';try{const res=await fetch(API+'/orders/',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({vendor_id:parseInt(vendorId),items})});if(!res.ok){const e=await res.json();throw new Error(e.detail);}const order=await res.json();showToast('✓ '+order.reference_no+' created!');setTimeout(()=>window.location.href='dashboard.html',1500);}catch(e){showToast(e.message||'Failed','error');btn.disabled=false;btn.textContent='Create Purchase Order';}}
+    async function init(){await Promise.all([loadVendors(),loadProducts()]);addRow();}
     init();
   </script>
 </body>
