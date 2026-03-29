@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException
+﻿from fastapi import APIRouter, HTTPException
 from fastapi.responses import RedirectResponse
 import httpx
 from jose import jwt
@@ -12,7 +12,7 @@ GOOGLE_AUTH_URL  = "https://accounts.google.com/o/oauth2/v2/auth"
 GOOGLE_TOKEN_URL = "https://oauth2.googleapis.com/token"
 GOOGLE_USERINFO  = "https://www.googleapis.com/oauth2/v3/userinfo"
 REDIRECT_URI     = "http://localhost:8000/auth/callback"
-
+FRONTEND_DASHBOARD = "http://127.0.0.1:5500/po-management/frontend/dashboard.html"
 
 def create_jwt(user_info: dict) -> str:
     payload = {
@@ -23,10 +23,8 @@ def create_jwt(user_info: dict) -> str:
     }
     return jwt.encode(payload, settings.JWT_SECRET_KEY, algorithm=settings.JWT_ALGORITHM)
 
-
 @router.get("/login")
 def login():
-    """Redirect user to Google OAuth consent screen"""
     params = (
         f"?client_id={settings.GOOGLE_CLIENT_ID}"
         f"&redirect_uri={REDIRECT_URI}"
@@ -36,12 +34,9 @@ def login():
     )
     return RedirectResponse(url=GOOGLE_AUTH_URL + params)
 
-
 @router.get("/callback")
 async def auth_callback(code: str):
-    """Exchange auth code for tokens, issue JWT, redirect to frontend"""
     async with httpx.AsyncClient() as client:
-        # 1. Exchange code for Google access token
         try:
             token_resp = await client.post(GOOGLE_TOKEN_URL, data={
                 "code":          code,
@@ -54,8 +49,6 @@ async def auth_callback(code: str):
             google_token = token_resp.json()["access_token"]
         except Exception:
             raise HTTPException(status_code=400, detail="Failed to exchange code with Google")
-
-        # 2. Fetch user info from Google
         try:
             userinfo_resp = await client.get(
                 GOOGLE_USERINFO,
@@ -66,17 +59,11 @@ async def auth_callback(code: str):
         except Exception:
             raise HTTPException(status_code=400, detail="Failed to fetch user info from Google")
 
-    # 3. Create our own JWT
     jwt_token = create_jwt(user_info)
-
-    # 4. Redirect to frontend with token in URL fragment
-    frontend_url = f"{settings.FRONTEND_URL}/dashboard.html#token={jwt_token}"
-    return RedirectResponse(url=frontend_url)
-
+    return RedirectResponse(url=f"{FRONTEND_DASHBOARD}?token={jwt_token}")
 
 @router.get("/me", response_model=schemas.UserInfo)
 def get_me(token: str):
-    """Decode JWT and return user info (used by frontend)"""
     try:
         payload = jwt.decode(
             token,
