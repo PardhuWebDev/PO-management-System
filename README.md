@@ -1,6 +1,6 @@
 # PO Management System
 
-A full-stack Purchase Order Management System built with FastAPI, PostgreSQL, and Vanilla JS — featuring Google OAuth, JWT authentication, and Gemini AI-powered product descriptions.
+A full-stack Purchase Order Management System built with FastAPI, PostgreSQL, and Vanilla JS featuring Google OAuth, JWT authentication, and Gemini AI-powered product descriptions.
 
 ---
 
@@ -273,4 +273,3 @@ docker compose down -v       # stop + delete database volume (fresh start)
 
 ---
 
-*Built for IV Innovations Private Limited assignment — ERP/MRP Module*
